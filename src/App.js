@@ -1,55 +1,36 @@
-import { useState } from "react";
+import React from "react";
 import "./App.css";
 import SearchBar from "./components/Search/SearchBar";
 import SearchResults from "./components/Search/SearchResults";
 import Wishlist from "./components/Wishlist/Wishlist";
+import { useDispatch } from "react-redux";
+import { addToWishlist, deleteFromWishlist } from "./features/wishlistSlice";
+import { fetchBooks } from "./features/bookSlice";
 
 function App() {
-    const [books, setBooks] = useState([]);
-    const [wishlist, setWishlist] = useState([]);
+    const dispatch = useDispatch();
 
     const handleSearch = async (bookName) => {
-        if (bookName.trim()) {
-            const response = await fetch(
-                `https://www.googleapis.com/books/v1/volumes?q=${bookName}&startIndex=0&maxResults=20`
-            );
-
-            const data = await response.json();
-            setBooks(data.items);
-
-            console.log(data.items);
-        }
+        dispatch(fetchBooks(bookName));
     };
 
     const handleAddToWishlist = (book) => {
-        const bookResult = wishlist.find((item) => {
-            return item.id === book.id;
-        });
-
-        if (bookResult === undefined) {
-            setWishlist([book, ...wishlist]);
-        }
+        dispatch(addToWishlist(book));
     };
 
     const handleDeleteFromWishlist = (id) => {
-        setWishlist(wishlist.filter((book) => book.id !== id));
+        dispatch(deleteFromWishlist(id));
     };
 
     return (
         <div className="App">
             <div>
                 <SearchBar onSubmit={handleSearch} />
-                <SearchResults
-                    books={books}
-                    onAddToWishlist={handleAddToWishlist}
-                />
+                <SearchResults onAddToWishlist={handleAddToWishlist} />
             </div>
 
             <div>
-                <Wishlist
-                    wishlist={wishlist}
-                    onDeleteFromWishlist={handleDeleteFromWishlist}
-                />
+                <Wishlist onDeleteFromWishlist={handleDeleteFromWishlist} />
             </div>
         </div>
     );
