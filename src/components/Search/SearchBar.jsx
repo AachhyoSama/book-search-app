@@ -1,12 +1,20 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setInputValue } from "../../features/searchSlice";
 import _ from "lodash";
+import { fetchBooks } from "../../features/bookSlice";
 
-export default function SearchBar({ onSubmit }) {
-    const [inputValue, setInputValue] = useState("");
+export default function SearchBar() {
+    const inputValue = useSelector((state) => state.search.inputValue);
+    const dispatch = useDispatch();
 
-    // using lodash to debounce the search value
-    // setting 1 second on onSubmit function
-    const debounceSubmit = useCallback(_.debounce(onSubmit, 1000), [onSubmit]);
+    // Debounce the search input
+    const debounceSubmit = useCallback(
+        _.debounce((value) => {
+            dispatch(fetchBooks(value));
+        }, 1000),
+        [dispatch]
+    );
 
     useEffect(() => {
         debounceSubmit(inputValue);
@@ -16,11 +24,11 @@ export default function SearchBar({ onSubmit }) {
         <div>
             <input
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => dispatch(setInputValue(e.target.value))}
             />
             <button
                 onClick={() => {
-                    onSubmit(inputValue);
+                    dispatch(fetchBooks(inputValue));
                 }}
             >
                 Search
