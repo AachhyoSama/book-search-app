@@ -23,14 +23,15 @@ function App() {
     };
 
     return (
-        <div className="App">
-            <div>
-                <SearchBar onSubmit={handleSearch} />
-                <SearchResults onAddToWishlist={handleAddToWishlist} />
-            </div>
-
-            <div>
-                <Wishlist onDeleteFromWishlist={handleDeleteFromWishlist} />
+        <div className="App flex items-center p-6">
+            <div className="flex w-full">
+                <div className="flex-1">
+                    <SearchBar onSubmit={handleSearch} />
+                    <SearchResults onAddToWishlist={handleAddToWishlist} />
+                </div>
+                <div className="ml-6 w-72">
+                    <Wishlist onDeleteFromWishlist={handleDeleteFromWishlist} />
+                </div>
             </div>
         </div>
     );
