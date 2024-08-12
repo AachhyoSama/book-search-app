@@ -13,25 +13,31 @@ export default function BookCard({ book, onAddToWishlist }) {
     } = book.volumeInfo;
 
     return (
-        <div className="bookCard" onClick={() => onAddToWishlist(book)}>
-            <img src={imageLinks?.thumbnail} alt={title} />
-            {/* <p>&#10084;</p> */}
-            <h3>{title}</h3>
-            <p>
+        <div
+            className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => onAddToWishlist(book)}
+        >
+            <img
+                src={imageLinks?.thumbnail}
+                alt={title}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+            />
+            <h3 className="text-lg font-semibold mb-2">{title}</h3>
+            <p className="text-sm text-gray-700 mb-1">
                 <strong>Authors:</strong> {authors}
             </p>
-            <p>
+            <p className="text-sm text-gray-700 mb-1">
                 <strong>Category:</strong> {categories}
             </p>
-            <p>
+            <p className="text-sm text-gray-700 mb-1">
                 <strong>Publisher:</strong> {publisher}
             </p>
-            <p>
+            <p className="text-sm text-gray-700 mb-1">
                 <strong>Published Date:</strong> {publishedDate}
             </p>
-            <p>
+            <p className="text-sm text-gray-600">
                 <strong>Description:</strong>{" "}
-                {description?.substring(0, 200) + "..."}
+                {description?.substring(0, 100) + "..."}
             </p>
         </div>
     );

@@ -3,7 +3,11 @@ import { fetchBooksAPI } from "../api/booksAPI";
 
 export const fetchBooks = createAsyncThunk(
     "books/fetchBooks",
-    async (bookName) => {
+    async (bookName, { rejectWithValue }) => {
+        if (!bookName) {
+            // Returning a custom error if the bookName is empty
+            return rejectWithValue("Search term cannot be empty.");
+        }
         return await fetchBooksAPI(bookName);
     }
 );
