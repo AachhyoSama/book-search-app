@@ -1,7 +1,12 @@
 import React from "react";
+import { Book } from "../../interfaces/bookTypes";
 
-export default function BookCard({ book, onAddToWishlist }) {
-    // destructuring
+interface BookCardProps {
+    book: Book;
+    onAddToWishlist: (book: Book) => void;
+}
+
+const BookCard: React.FC<BookCardProps> = ({ book, onAddToWishlist }) => {
     const {
         title,
         authors,
@@ -24,10 +29,10 @@ export default function BookCard({ book, onAddToWishlist }) {
             />
             <h3 className="text-lg font-semibold mb-2">{title}</h3>
             <p className="text-sm text-gray-700 mb-1">
-                <strong>Authors:</strong> {authors}
+                <strong>Authors:</strong> {authors?.join(", ")}
             </p>
             <p className="text-sm text-gray-700 mb-1">
-                <strong>Category:</strong> {categories}
+                <strong>Category:</strong> {categories?.join(", ")}
             </p>
             <p className="text-sm text-gray-700 mb-1">
                 <strong>Publisher:</strong> {publisher}
@@ -41,4 +46,6 @@ export default function BookCard({ book, onAddToWishlist }) {
             </p>
         </div>
     );
-}
+};
+
+export default BookCard;

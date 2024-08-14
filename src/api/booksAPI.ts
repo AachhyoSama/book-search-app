@@ -1,4 +1,4 @@
-export const fetchBooksAPI = async (bookName) => {
+export const fetchBooksAPI = async (bookName: string): Promise<any[]> => {
     const response = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${bookName}&startIndex=0&maxResults=20`
     );

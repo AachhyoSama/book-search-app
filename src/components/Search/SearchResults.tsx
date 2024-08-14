@@ -1,13 +1,17 @@
 import React from "react";
-import BookCard from "../Book/BookCard";
 import { useSelector } from "react-redux";
+import BookCard from "../Book/BookCard";
+import { Book } from "../../interfaces/bookTypes";
 
-export default function SearchResults({ onAddToWishlist }) {
-    const { books, status } = useSelector((state) => state.books);
-    const lastSearchTerm = useSelector((state) => state.search.lastSearchTerm); // Taking the last search term
+interface SearchResultsProps {
+    onAddToWishlist: (book: Book) => void;
+}
+
+const SearchResults: React.FC<SearchResultsProps> = ({ onAddToWishlist }) => {
+    const { books, status } = useSelector((state: any) => state.books);
+    const lastSearchTerm = useSelector((state: any) => state.search.lastSearchTerm);
 
     return status === "loading" ? (
-        // Spinner for loading state
         <div className="flex justify-center items-center h-screen">
             <svg
                 className="animate-spin h-8 w-8 text-blue-600"
@@ -38,8 +42,7 @@ export default function SearchResults({ onAddToWishlist }) {
                 </h2>
             )}
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {/* Optional for books as books could be empty */}
-                {books?.map((book) => (
+                {books?.map((book: Book) => (
                     <BookCard
                         book={book}
                         key={book.id}
@@ -49,4 +52,6 @@ export default function SearchResults({ onAddToWishlist }) {
             </ul>
         </>
     );
-}
+};
+
+export default SearchResults;

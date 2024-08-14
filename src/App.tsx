@@ -6,19 +6,21 @@ import Wishlist from "./components/Wishlist/Wishlist";
 import { useDispatch } from "react-redux";
 import { addToWishlist, deleteFromWishlist } from "./features/wishlistSlice";
 import { fetchBooks } from "./features/bookSlice";
+import { AppDispatch } from "./app/store"; // Import AppDispatch
+import { Book } from "./interfaces/bookTypes";
 
 function App() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>(); // Use AppDispatch type
 
-    const handleSearch = async (bookName) => {
+    const handleSearch = async (bookName: string) => {
         dispatch(fetchBooks(bookName));
     };
 
-    const handleAddToWishlist = (book) => {
+    const handleAddToWishlist = (book: Book) => {
         dispatch(addToWishlist(book));
     };
 
-    const handleDeleteFromWishlist = (id) => {
+    const handleDeleteFromWishlist = (id: string) => {
         dispatch(deleteFromWishlist(id));
     };
 

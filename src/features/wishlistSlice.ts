@@ -1,10 +1,11 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Book } from "../interfaces/bookTypes";
 
-export const wishlistSlice = createSlice({
+const wishlistSlice = createSlice({
     name: "wishlist",
-    initialState: [],
+    initialState: [] as Book[],
     reducers: {
-        addToWishlist: (state, action) => {
+        addToWishlist: (state, action: PayloadAction<Book>) => {
             const existingBook = state.find(
                 (book) => book.id === action.payload.id
             );
@@ -12,7 +13,7 @@ export const wishlistSlice = createSlice({
                 state.push(action.payload);
             }
         },
-        deleteFromWishlist: (state, action) => {
+        deleteFromWishlist: (state, action: PayloadAction<string>) => {
             const index = state.findIndex((book) => book.id === action.payload);
             if (index !== -1) {
                 state.splice(index, 1);

@@ -1,29 +1,29 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-    setInputValue,
-    setSuggestions,
-    clearSuggestions,
-    setLastSearchTerm,
-} from "../../features/searchSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../app/store";
+import { setInputValue, setSuggestions, clearSuggestions, setLastSearchTerm } from "../../features/searchSlice";
+import { fetchBooks } from "../../features/bookSlice";
+import { Book } from "../../interfaces/bookTypes";
 import _ from "lodash";
-import { fetchBooks, fetchBookTitles } from "../../features/bookSlice";
 
-export default function SearchBar() {
-    const { inputValue, suggestions } = useSelector((state) => state.search);
-    const { titles } = useSelector((state) => state.books);
-    const dispatch = useDispatch();
+interface SearchBarProps {
+    onSubmit: (bookName: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSubmit }) => {
+    const { inputValue, suggestions } = useSelector((state: RootState) => state.search);
+    const { books } = useSelector((state: RootState) => state.books);
+    const dispatch = useDispatch<AppDispatch>();
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
-    const [showSearchResults, setShowSearchResults] = useState(false); // Track if search results should be shown
-    const suggestionsRef = useRef(null);
-    const inputRef = useRef(null);
-    const suggestionRefs = useRef([]);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+    const suggestionsRef = useRef<HTMLUListElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
 
-    // Debounce the suggestion fetching
     const debounceUpdateSuggestions = useCallback(
-        _.debounce((value) => {
+        _.debounce((value: string) => {
             if (value.trim()) {
-                dispatch(fetchBookTitles(value)); // Fetch only titles for suggestions
+                dispatch(fetchBooks(value));
             } else {
                 dispatch(clearSuggestions());
             }
@@ -37,39 +37,39 @@ export default function SearchBar() {
 
     useEffect(() => {
         if (inputValue.trim()) {
-            dispatch(setSuggestions(titles)); // Set titles as suggestions
+            dispatch(setSuggestions(books.map(book => book.volumeInfo.title)));
         } else {
             dispatch(clearSuggestions());
         }
-    }, [inputValue, titles, dispatch]);
+    }, [inputValue, books, dispatch]);
 
     useEffect(() => {
         if (inputValue.trim() && showSearchResults) {
-            dispatch(fetchBooks(inputValue)); // Fetch full book data when search is triggered
+            dispatch(fetchBooks(inputValue));
             dispatch(setLastSearchTerm(inputValue));
-            setShowSearchResults(false); // Reset show search results flag
+            setShowSearchResults(false);
         }
     }, [inputValue, showSearchResults, dispatch]);
 
-    const handleSelectSuggestion = (suggestion) => {
+    const handleSelectSuggestion = (suggestion: string) => {
         dispatch(setInputValue(suggestion));
-        dispatch(fetchBooks(suggestion)); // Fetch full book data on suggestion selection
+        dispatch(fetchBooks(suggestion));
         dispatch(setLastSearchTerm(suggestion));
         dispatch(clearSuggestions());
         setActiveSuggestionIndex(-1);
-        setShowSearchResults(true); // Show search results
+        setShowSearchResults(true);
     };
 
     const handleSearch = () => {
         if (inputValue.trim()) {
-            dispatch(fetchBooks(inputValue)); // Fetch full book data on search
+            onSubmit(inputValue);
             dispatch(setLastSearchTerm(inputValue));
             dispatch(clearSuggestions());
-            setShowSearchResults(true); // Show search results
+            setShowSearchResults(true);
         }
     };
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "ArrowDown") {
             e.preventDefault();
             setActiveSuggestionIndex((prevIndex) => {
@@ -105,20 +105,20 @@ export default function SearchBar() {
             ) {
                 handleSelectSuggestion(suggestions[activeSuggestionIndex]);
             } else {
-                handleSearch(); // Fetch books if no suggestion is selected
+                handleSearch();
             }
         } else if (e.key === "Escape") {
             dispatch(clearSuggestions());
             setActiveSuggestionIndex(-1);
-            inputRef.current.blur();
+            inputRef.current?.blur();
         }
     };
 
-    const handleClickOutside = (e) => {
+    const handleClickOutside = (e: MouseEvent) => {
         if (
             suggestionsRef.current &&
-            !suggestionsRef.current.contains(e.target) &&
-            !inputRef.current.contains(e.target)
+            !suggestionsRef.current.contains(e.target as Node) &&
+            !inputRef.current?.contains(e.target as Node)
         ) {
             dispatch(clearSuggestions());
             setActiveSuggestionIndex(-1);
@@ -146,7 +146,7 @@ export default function SearchBar() {
                 />
                 <button
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onClick={handleSearch} // Handle search button click
+                    onClick={handleSearch}
                 >
                     Search
                 </button>
@@ -161,13 +161,10 @@ export default function SearchBar() {
                         <li
                             key={index}
                             ref={(el) => (suggestionRefs.current[index] = el)}
-                            className={`p-2 cursor-pointer hover:bg-gray-200 ${
-                                index === activeSuggestionIndex
-                                    ? "bg-gray-200"
-                                    : ""
+                            className={`p-2 cursor-pointer hover:bg-gray-100 ${
+                                index === activeSuggestionIndex ? "bg-gray-200" : ""
                             }`}
                             onClick={() => handleSelectSuggestion(suggestion)}
-                            onMouseEnter={() => setActiveSuggestionIndex(index)}
                         >
                             {suggestion}
                         </li>
@@ -176,4 +173,6 @@ export default function SearchBar() {
             )}
         </div>
     );
-}
+};
+
+export default SearchBar;

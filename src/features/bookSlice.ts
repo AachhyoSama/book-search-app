@@ -1,10 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchBooksAPI } from "../api/booksAPI";
+import { Book } from "../interfaces/bookTypes";
 
-// Existing thunk for fetching full book data
+interface BookState {
+    books: Book[];
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | undefined;
+    titles: string[];
+}
+
 export const fetchBooks = createAsyncThunk(
     "books/fetchBooks",
-    async (bookName, { rejectWithValue }) => {
+    async (bookName: string, { rejectWithValue }) => {
         if (!bookName) {
             return rejectWithValue("Search term cannot be empty.");
         }
@@ -12,27 +19,27 @@ export const fetchBooks = createAsyncThunk(
     }
 );
 
-// New thunk for fetching book titles for suggestions
 export const fetchBookTitles = createAsyncThunk(
     "books/fetchBookTitles",
-    async (bookName, { rejectWithValue }) => {
+    async (bookName: string, { rejectWithValue }) => {
         if (!bookName) {
             return rejectWithValue("Search term cannot be empty.");
         }
         const response = await fetchBooksAPI(bookName);
-        // Extract titles from the response
-        return response.map((book) => book.volumeInfo.title);
+        return response.map((book: Book) => book.volumeInfo.title);
     }
 );
 
-export const bookSlice = createSlice({
+const initialState: BookState = {
+    books: [],
+    status: "idle",
+    error: undefined,
+    titles: [],
+};
+
+const bookSlice = createSlice({
     name: "books",
-    initialState: {
-        books: [],
-        status: "idle",
-        error: null,
-        titles: [], // New state for storing book titles
-    },
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
